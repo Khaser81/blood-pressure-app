@@ -158,43 +158,38 @@ if res.status_code == 200:
         )
 
         # --- 📥 CSVインポート ---
-st.subheader("📥 CSVインポート")
+        st.subheader("📥 CSVインポート")
 
         # ✅ サンプルCSVのダウンロードボタンを追加
-        sample_df = pd.DataFrame({
-            "date": ["2025-11-01", "2025-11-02", "2025-11-03"],
-            "systolic": [125, 118, 122],
-            "diastolic": [80, 76, 78],
-            "pulse": [70, 68, 72],
-            "note": ["朝測定", "夜測定", "昼食後"]
-        })
+    sample_df = pd.DataFrame({
+        "date": ["2025-11-01", "2025-11-02", "2025-11-03"],
+        "systolic": [125, 118, 122],
+        "diastolic": [80, 76, 78],
+        "pulse": [70, 68, 72],
+        "note": ["朝測定", "夜測定", "昼食後"]
+    })
 
-        st.markdown("以下の形式でCSVを作成してください：")
-        st.dataframe(sample_df)
+    st.markdown("以下の形式でCSVを作成してください：")
+    st.dataframe(sample_df)
 
-        sample_csv = sample_df.to_csv(index=False)
-        st.download_button(
-            label="📄 サンプルCSVをダウンロード / Download sample CSV",
-            data=sample_csv,
-            file_name="sample_blood_pressure.csv",
-            mime="text/csv",
-        )
+    sample_csv = sample_df.to_csv(index=False)
+    st.download_button(
+        label="📄 サンプルCSVをダウンロード / Download sample CSV",
+        data=sample_csv,
+        file_name="sample_blood_pressure.csv",
+        mime="text/csv",
+    )
 
-        # --- 📥 CSVインポート ---
-        st.subheader("📥 CSVインポート")
-        uploaded = st.file_uploader("CSVファイルを選択 / Choose CSV file", type=["csv"])
-        if uploaded is not None:
-            try:
-                df_preview = pd.read_csv(uploaded)
-                st.write("プレビュー / Preview:")
-                st.dataframe(df_preview.head())
+    # --- CSVファイルアップロード ---
+    uploaded = st.file_uploader("CSVファイルを選択 / Choose CSV file", type=["csv"])
+    if uploaded is not None:
+        try:
+            df_preview = pd.read_csv(uploaded)
+            st.write("プレビュー / Preview:")
+            st.dataframe(df_preview.head())
 
-                if st.button("⬆️ DBにインポート / Import to DB"):
-                    success_count = import_csv(uploaded, API_URL)
-                    st.success(f"✅ {success_count} 件のレコードを追加しました！")
-            except Exception as e:
-                st.error(f"❌ 読み込みエラー: {e}")
-    else:
-        st.info(T["no_data"])
-else:
-    st.error(T["server_error"])
+            if st.button("⬆️ DBにインポート / Import to DB"):
+                success_count = import_csv(uploaded, API_URL)
+                st.success(f"✅ {success_count} 件のレコードを追加しました！")
+        except Exception as e:
+            st.error(f"❌ 読み込みエラー: {e}")

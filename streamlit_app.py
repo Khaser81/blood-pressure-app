@@ -9,10 +9,12 @@ from pathlib import Path
 # 自作モジュール
 from utils.csv_io import export_csv, import_csv
 
-API_URL = "http://127.0.0.1:8000"
+API_URL = os.getenv("API_URL", "https://blood-pressure-api.onrender.com")
+
 
 # --- 言語ファイルロード ---
 LOCALE_DIR = Path(__file__).parent / "locales"
+
 
 def load_translations():
     translations = {}
@@ -22,7 +24,9 @@ def load_translations():
             translations[lang_code] = yaml.safe_load(f)
     return translations
 
+
 TEXTS = load_translations()
+
 
 # --- OSロケールで初期言語を自動設定 ---
 def detect_language():
@@ -37,12 +41,14 @@ def detect_language():
     else:
         return "en"
 
+
 default_lang = detect_language()
 
 # --- 言語選択 ---
 lang_code = st.sidebar.selectbox(
-    "🌐 Language / 言語", list(TEXTS.keys()),
-    index=list(TEXTS.keys()).index(default_lang)
+    "🌐 Language / 言語",
+    list(TEXTS.keys()),
+    index=list(TEXTS.keys()).index(default_lang),
 )
 T = TEXTS[lang_code]
 
@@ -123,9 +129,7 @@ if res.status_code == 200:
         # --- 平日/休日統計 ---
         st.subheader(T["weekday_stats"])
         grouped = (
-            df.groupby("day_type")[["systolic", "diastolic", "pulse"]]
-            .mean()
-            .round(1)
+            df.groupby("day_type")[["systolic", "diastolic", "pulse"]].mean().round(1)
         )
         st.table(
             grouped.rename(
@@ -161,13 +165,15 @@ if res.status_code == 200:
         st.subheader("📥 CSVインポート")
 
         # ✅ サンプルCSVのダウンロードボタンを追加
-        sample_df = pd.DataFrame({
-            "date": ["2025-11-01", "2025-11-02", "2025-11-03"],
-            "systolic": [125, 118, 122],
-            "diastolic": [80, 76, 78],
-            "pulse": [70, 68, 72],
-            "note": ["朝測定", "夜測定", "昼食後"]
-        })
+        sample_df = pd.DataFrame(
+            {
+                "date": ["2025-11-01", "2025-11-02", "2025-11-03"],
+                "systolic": [125, 118, 122],
+                "diastolic": [80, 76, 78],
+                "pulse": [70, 68, 72],
+                "note": ["朝測定", "夜測定", "昼食後"],
+            }
+        )
 
         st.markdown("以下の形式でCSVを作成してください：")
         st.dataframe(sample_df)
